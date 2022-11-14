@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 import os
+import time
 import pandas as pd
 import json
 from sqlalchemy import *
@@ -112,7 +113,7 @@ def Sponsor():
 
 @app.route('/hello')
 def hello():
-    cursor = g.conn.execute("select * from subm_sub")
+    cursor = g.conn.execute("select * from Users")
     names = []
     for result in cursor:
         names.append(result[:])
@@ -143,6 +144,71 @@ def Team():
         datalist.append(result[:])
     cursor.close()
     return render_template("Team.html", data=datalist)
+
+
+
+@app.route('/joins', methods=["post"])
+def joins():
+    uid = request.form['uid']
+    tid = request.form['tid']
+    cursor = g.conn.execute("SELECT uid, tid from Joins where uid = %s and tid = %s",
+                            [uid, tid])
+    joins = cursor.fetchone()
+
+    if joins is None:
+        g.conn.execute("Insert into Joins(tid,uid,since) values (%s, %s, now())",
+                       [tid, uid])
+
+        return render_template('Team.html', joins={'uid':uid, 'tid':tid}, msg="Join the team successful")
+    else:
+        d = {"uid": joins[0], "tid": joins[1]}
+        return render_template('Team.html', joins=json.dumps(d), msg="The user already in the team")
+
+@app.route('/members', methods=["post"])
+def members():
+    tid = request.form['tid']
+    cursor = g.conn.execute("SELECT tid, uid FROM Joins where tid = %s",[tid])
+
+    datalist = []
+    for result in cursor:
+        datalist.append(result[1:])  # can also be accessed using result[0]
+    d = {"tid":tid, "uid":datalist}
+    cursor.close()
+    return render_template("Team.html", members=json.dumps(d))
+
+@app.route('/join_c', methods=["post"])
+def join_c():
+    cid = request.form['cid']
+    tid = request.form['tid']
+    cursor = g.conn.execute("SELECT cid, tid from Participates where cid = %s and tid = %s",
+                            [cid, tid])
+    joins = cursor.fetchone()
+
+    if joins is None:
+        try:
+            g.conn.execute("Insert into Participates(tid,cid) values (%s, %s)",
+                       [tid, cid])
+            return render_template('Competition.html', joins={'cid':cid, 'tid':tid}, msg="Join the contest successful")
+        except:
+            return render_template('Competition.html', joins={'cid':cid, 'tid':tid}, msg="No such a team/contest")
+    else:
+        d = {"uid": joins[0], "tid": joins[1]}
+        return render_template('Competition.html', joins=json.dumps(d), msg="The team already participated the contest")
+
+
+
+@app.route('/Check_Teams', methods=["post"])
+def Check_Teams():
+    cid = request.form['cid']
+    cursor = g.conn.execute("SELECT cid,tid FROM Participates where cid = %s",[cid])
+
+    datalist = []
+    for result in cursor:
+        datalist.append(result[1:])  # can also be accessed using result[0]
+    d = {"cid":cid, "tid":datalist}
+    cursor.close()
+    return render_template("Competition.html", teams=json.dumps(d))
+
 
 
 if __name__ == "__main__":

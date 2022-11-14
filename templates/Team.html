@@ -72,6 +72,24 @@
     </div>
   </header><!-- End Header -->
 
+  <body>
+    <form method="post" action="/joins">
+    <input type="text" placeholder="Enter user id" name="uid">
+    <input type="password" placeholder="Enter team id" name="tid">
+    <input type="submit" value="Join">
+    </form>
+    <h1>{{ msg }} {{ joins }}</h1>
+  </body>
+
+    <body>
+    <form method="post" action="/members">
+    <input type="password" placeholder="Enter team id" name="tid">
+    <input type="submit" value="Check Members">
+    </form>
+    <h1>{{ members }}</h1>
+  </body>
+
+
 
   <main id="main">
 

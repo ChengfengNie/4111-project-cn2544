@@ -73,6 +73,25 @@
   </header><!-- End Header -->
 
 
+  <body>
+    <form method="post" action="/Check_Teams">
+    <input type="password" placeholder="Enter Competition id" name="cid">
+    <input type="submit" value="Check teams">
+    </form>
+    <h1>{{ teams }}</h1>
+  </body>
+
+  <body>
+    <form method="post" action="/join_c">
+    <input type="text" placeholder="Enter Competition id" name="cid">
+    <input type="password" placeholder="Enter team id" name="tid">
+    <input type="submit" value="Join">
+    </form>
+    <h1>{{ msg }} {{ joins }}</h1>
+  </body>
+
+
+
   <main id="main">
 
 
